@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class RequestStatusSeeder extends Seeder
 {
@@ -13,6 +14,13 @@ class RequestStatusSeeder extends Seeder
      */
     public function run()
     {
-        //
+        DB::table('request_status')->insert(array(
+            array(
+                'request_status' => 'user_approve'
+            ),
+            array(
+                'request_status' => 'user_deny'
+            )
+        ));
     }
 }

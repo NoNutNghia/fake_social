@@ -21,6 +21,7 @@ class CreateUsersTable extends Migration
             $table->string('uuid');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('phone')->unique();
             $table->unsignedInteger('coins')->default(0);
             $table->tinyInteger('status_user');
             $table->tinyInteger('role');

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class TypeRequestSeeder extends Seeder
 {
@@ -13,6 +14,13 @@ class TypeRequestSeeder extends Seeder
      */
     public function run()
     {
-        //
+        DB::table('type_request')->insert(array(
+            array(
+                'type_request_name' => 'user_receive'
+            ),
+            array(
+                'type_request_name' => 'user_send'
+            )
+        ));
     }
 }
