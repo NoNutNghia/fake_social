@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateEmotionPostTable extends Migration
+class CreateVideoPostTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,13 @@ class CreateEmotionPostTable extends Migration
      */
     public function up()
     {
-        Schema::create('emotion_post', function (Blueprint $table) {
+        Schema::create('video_post', function (Blueprint $table) {
             $table->id();
             $table->integer('post_id');
-            $table->integer('user_id');
-            $table->timestamp('created_at');
-            $table->string('emotion_code');
+            $table->string('url');
+            $table->string('thumbnail')->nullable();
+            $table->integer('sort_index');
+            $table->timestamps();
         });
     }
 
@@ -29,6 +30,6 @@ class CreateEmotionPostTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('emotion_post');
+        Schema::dropIfExists('video_post');
     }
 }

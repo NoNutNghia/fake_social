@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Repository\Impl\UserRepositoryImpl;
+use App\Repository\UserRepository;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,7 +15,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton(UserRepository::class, function () {
+            return new UserRepositoryImpl();
+        });
     }
 
     /**

@@ -11,10 +11,15 @@ class Post extends Model
 
     protected $fillable = [
         'user_id',
-        'content',
+        'described',
         'media',
-        'post_status'
+        'post_status',
+        'status'
     ];
 
     protected $table = 'post';
+
+    public function containImages() {
+//        return $this->hasMany()
+    }
 }

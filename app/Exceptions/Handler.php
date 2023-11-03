@@ -2,7 +2,12 @@
 
 namespace App\Exceptions;
 
+use App\Enum\ResponseCodeEnum;
+use App\Response\Model\ResponseObject;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -36,6 +41,26 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             //
+        });
+
+        $this->renderable(function (MethodNotAllowedHttpException $e) {
+            $responseError = new ResponseObject(ResponseCodeEnum::CODE_9997);
+            return response()->json($responseError->toArray());
+        });
+
+        $this->renderable(function (ThrottleRequestsException $e) {
+            $responseError = new ResponseObject(ResponseCodeEnum::CODE_1009);
+            return response()->json($responseError->toArray());
+        });
+
+        $this->renderable(function (AuthenticationException $e, $request) {
+            if ($request->is('api/*')) {
+                $responseError = new ResponseObject(ResponseCodeEnum::CODE_9998);
+                return response()->json($responseError->toArray());
+            }
+
+            $responseError = new ResponseObject(ResponseCodeEnum::CODE_9999);
+            return response()->json($responseError->toArray());
         });
     }
 }

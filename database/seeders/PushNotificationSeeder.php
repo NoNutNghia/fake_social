@@ -25,5 +25,14 @@ class PushNotificationSeeder extends Seeder
             'noti_react_comment' => true,
             'noti_post_by_friend' => true,
         ));
+        PushNotification::create(array(
+            'user_id' => 2,
+            'noti_request' => true,
+            'noti_post_by_myself' => true,
+            'noti_comment' => true,
+            'noti_react_post' => true,
+            'noti_react_comment' => true,
+            'noti_post_by_friend' => true,
+        ));
     }
 }

@@ -2,14 +2,14 @@
 
 namespace App\Models;
 
-class EmotionPost extends BaseModel
+class RatingPost extends BaseModel
 {
     protected $fillable = [
         'user_id',
         'post_id',
-        'emotion_code',
+        'rating',
         'created_at'
     ];
 
-    protected $table = 'emotion_post';
+    protected $table = 'rating_post';
 }

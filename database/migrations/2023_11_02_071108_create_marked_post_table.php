@@ -1,11 +1,10 @@
 <?php
 
-use App\Enum\PostStatusEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePostTable extends Migration
+class CreateMarkedPostTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,13 +13,11 @@ class CreatePostTable extends Migration
      */
     public function up()
     {
-        Schema::create('post', function (Blueprint $table) {
+        Schema::create('marked_post', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id');
-            $table->longText('described')->default("");
-            $table->tinyInteger('post_status')->default(PostStatusEnum::PUBLIC_POST);
-            $table->string('status')->default("");
-            $table->timestamps();
+            $table->integer('post_id');
+            $table->timestamp('created_at');
         });
     }
 
@@ -31,6 +28,6 @@ class CreatePostTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('post');
+        Schema::dropIfExists('marked_post');
     }
 }

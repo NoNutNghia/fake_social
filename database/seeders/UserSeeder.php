@@ -30,7 +30,20 @@ class UserSeeder extends Seeder
             'role' => RoleEnum::USER,
             'gender' => GenderEnum::MALE,
             'phone' => '0969696969',
-            'password' => sha1('password')
+            'password' => bcrypt('password')
+        ]);
+        User::create([
+            'username' => "NotNutNghia",
+            'avatar' => '',
+            'email' => 'broyoutrust@newfake.com',
+            'uuid' => Str::uuid(),
+            'email_verified_at' => Carbon::now(),
+            'coins' => 69,
+            'status_user' => StatusUserEnum::ACTIVE,
+            'role' => RoleEnum::USER,
+            'gender' => GenderEnum::MALE,
+            'phone' => '0969696966',
+            'password' => bcrypt('password')
         ]);
     }
 }
