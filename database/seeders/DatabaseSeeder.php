@@ -22,5 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call(TypeRequestSeeder::class);
         $this->call(GenderSeeder::class);
         $this->call(RequestStatusSeeder::class);
+        $this->call(RatingPostSeeder::class);
+        $this->call(VersionSeeder::class);
     }
 }

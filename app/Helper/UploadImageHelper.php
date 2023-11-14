@@ -15,4 +15,30 @@ class UploadImageHelper
 
         return false;
     }
+
+    static public function uploadAvatar($imageFile, $userID)
+    {
+        $path = "public/avatar/";
+
+        if (Storage::putFileAs($path, $imageFile, $userID . '.' . $imageFile->getClientOriginalExtension())) {
+            return $path . $userID . '.' . $imageFile->getClientOriginalExtension();
+        }
+
+        return false;
+    }
+
+    static public function uploadCoverImage($imageFile, $userID)
+    {
+        $path = "public/cover_image/";
+
+        if (Storage::putFileAs($path, $imageFile, $userID . '.' . $imageFile->getClientOriginalExtension())) {
+            return $path . $userID . '.' . $imageFile->getClientOriginalExtension();
+        }
+
+        return false;
+    }
+
+    static public function deleteImage($oldPath) {
+        return Storage::delete($oldPath);
+    }
 }

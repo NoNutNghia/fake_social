@@ -13,7 +13,6 @@ class ImageUploadRule implements Rule
      */
 
     private $imageList;
-
     public function __construct($imageList)
     {
         $this->imageList = $imageList;

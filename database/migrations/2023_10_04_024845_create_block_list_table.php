@@ -17,6 +17,7 @@ class CreateBlockListTable extends Migration
             $table->id();
             $table->integer('user_id');
             $table->integer('user_blocked_id');
+            $table->timestamp('created_at');
         });
     }
 

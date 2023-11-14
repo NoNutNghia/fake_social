@@ -1,5 +1,6 @@
 <?php
 
+use App\Enum\RequestStatusEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -18,7 +19,8 @@ class CreateRequestFriendTable extends Migration
             $table->integer('user_id');
             $table->integer('target_id');
             $table->tinyInteger('request_type');
-            $table->timestamp('created_at');
+            $table->tinyInteger('request_status')->default(RequestStatusEnum::USER_PENDING);
+            $table->timestamps();
         });
     }
 

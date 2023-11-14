@@ -7,8 +7,6 @@ use BenSampo\Enum\Enum;
 
 final class RatingPostEnum extends Enum implements LocalizedEnum
 {
-    public const TRUST = 1;
-    public const FAKE = 2;
-    public const KUDOS = 3;
-    public const DISAPPOINTED = 4;
+    public const KUDOS = 1;
+    public const DISAPPOINTED = 0;
 }

@@ -18,21 +18,31 @@ class PushNotificationSeeder extends Seeder
     {
         PushNotification::create(array(
             'user_id' => 1,
-            'noti_request' => true,
-            'noti_post_by_myself' => true,
-            'noti_comment' => true,
-            'noti_react_post' => true,
-            'noti_react_comment' => true,
-            'noti_post_by_friend' => true,
+            'like_comment' => true,
+            'from_friends' => true,
+            'requested_friends' => true,
+            'suggested_friend' => true,
+            'birthday' => true,
+            'video' => true,
+            'report' => true,
+            'sound_on' => true,
+            'notification_on' => true,
+            'vibrant_on' => true,
+            'led_on' => true,
         ));
         PushNotification::create(array(
             'user_id' => 2,
-            'noti_request' => true,
-            'noti_post_by_myself' => true,
-            'noti_comment' => true,
-            'noti_react_post' => true,
-            'noti_react_comment' => true,
-            'noti_post_by_friend' => true,
+            'like_comment' => true,
+            'from_friends' => true,
+            'requested_friends' => true,
+            'suggested_friend' => true,
+            'birthday' => true,
+            'video' => true,
+            'report' => true,
+            'sound_on' => true,
+            'notification_on' => true,
+            'vibrant_on' => true,
+            'led_on' => true,
         ));
     }
 }

@@ -27,6 +27,9 @@ class PostStatusSeeder extends Seeder
             array(
                 'post_status' => 'deleted'
             ),
+            array(
+                'post_status' => 'blocked'
+            ),
         ));
     }
 }

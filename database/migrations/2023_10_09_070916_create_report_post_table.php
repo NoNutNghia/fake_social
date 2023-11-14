@@ -17,7 +17,8 @@ class CreateReportPostTable extends Migration
             $table->id();
             $table->integer('user_id');
             $table->integer('post_id');
-            $table->text('content');
+            $table->string('subject');
+            $table->text('details');
             $table->timestamp('created_at');
         });
     }

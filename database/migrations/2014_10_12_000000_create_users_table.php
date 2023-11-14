@@ -27,6 +27,12 @@ class CreateUsersTable extends Migration
             $table->tinyInteger('status_user')->default(StatusUserEnum::INACTIVE);
             $table->tinyInteger('role')->nullable();
             $table->tinyInteger('gender')->nullable();
+            $table->string('address')->nullable();
+            $table->string('country')->nullable();
+            $table->string('city')->nullable();
+            $table->string('link')->default("t.ly/xzLR");
+            $table->string('cover_image')->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

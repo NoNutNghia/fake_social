@@ -10,4 +10,13 @@ class BlockList extends BaseModel
     ];
 
     protected $table = 'block_list';
+
+    protected $hidden = [
+        'created_at'
+    ];
+
+    public function detailUser()
+    {
+        return $this->hasOne(User::class, 'id', 'user_id');
+    }
 }

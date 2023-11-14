@@ -9,6 +9,4 @@ class FriendList extends BaseModel
     ];
 
     protected $table = 'friend_list';
-
-
 }

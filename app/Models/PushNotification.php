@@ -11,12 +11,24 @@ class PushNotification extends Model
 
     protected $fillable = [
         'user_id',
-        'noti_request',
-        'noti_post_by_myself',
-        'noti_comment',
-        'noti_react_post',
-        'noti_react_comment',
-        'noti_post_by_friend',
+        'like_comment',
+        'from_friends',
+        'requested_friends',
+        'suggested_friend',
+        'birthday',
+        'video',
+        'report',
+        'sound_on',
+        'notification_on',
+        'vibrant_on',
+        'led_on',
+    ];
+
+    protected $hidden = [
+        'id',
+        'user_id',
+        'created_at',
+        'updated_at',
     ];
 
     protected $table = 'push_noti';

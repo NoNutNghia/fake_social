@@ -3,8 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AddPostRequest;
+use App\Http\Requests\DeletePostRequest;
+use App\Http\Requests\FeelRequest;
+use App\Http\Requests\GetMarkCommentRequest;
+use App\Http\Requests\GetPostRequest;
+use App\Http\Requests\ReportPostRequest;
+use App\Http\Requests\SetMarkCommentRequest;
 use App\Services\PostService;
-use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
@@ -21,5 +26,35 @@ class PostController extends Controller
     public function addPost(AddPostRequest $addPostRequest)
     {
         return $this->postService->addPost($addPostRequest);
+    }
+
+    public function getPost(GetPostRequest $getPostRequest)
+    {
+        return $this->postService->getPost($getPostRequest);
+    }
+
+    public function deletePost(DeletePostRequest $deletePostRequest)
+    {
+        return $this->postService->deletePost($deletePostRequest);
+    }
+
+    public function reportPost(ReportPostRequest $reportPostRequest)
+    {
+        return $this->postService->reportPost($reportPostRequest);
+    }
+
+    public function feel(FeelRequest $feelRequest)
+    {
+        return $this->postService->feel($feelRequest);
+    }
+
+    public function getMarkComment(GetMarkCommentRequest $getMarkCommentRequest)
+    {
+        return $this->postService->getMarkComment($getMarkCommentRequest);
+    }
+
+    public function setMarkComment(SetMarkCommentRequest $setMarkCommentRequest)
+    {
+        return $this->postService->setMarkComment($setMarkCommentRequest);
     }
 }

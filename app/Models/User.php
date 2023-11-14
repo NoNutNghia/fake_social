@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enum\RequestStatusEnum;
+use App\Enum\TypeRequestEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -25,7 +27,12 @@ class User extends Authenticatable
         'role',
         'password',
         'gender',
-        'phone'
+        'phone',
+        'country',
+        'city',
+        'link',
+        'cover_image',
+        'description',
     ];
 
     /**
@@ -35,6 +42,15 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
+        'updated_at',
+        'status_user',
+        'role',
+        'password',
+        'gender',
+        'list_user_blocked',
+        'phone',
+        'email_verified_at',
+        'uuid',
     ];
 
     /**
@@ -54,5 +70,28 @@ class User extends Authenticatable
     public function listVerifyCode()
     {
         return $this->hasMany(VerifyCode::class, 'user_id', 'id');
+    }
+
+    public function listUserBlocked()
+    {
+        return $this->hasMany(BlockList::class, 'user_id', 'id');
+    }
+
+    public function sendRequestFriend()
+    {
+        return $this->hasMany(RequestFriend::class, 'user_id', 'id')
+            ->where('request_status', RequestStatusEnum::USER_PENDING)
+            ->where('request_type', TypeRequestEnum::USER_SEND)
+            ->get();
+    }
+
+    public function pushNotification()
+    {
+        return $this->hasOne(PushNotification::class,'user_id', 'id');
+    }
+
+    public function listFriends()
+    {
+        return $this->hasMany(FriendList::class, 'user_id', 'id');
     }
 }

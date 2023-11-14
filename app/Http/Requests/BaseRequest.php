@@ -40,10 +40,12 @@ class BaseRequest extends FormRequest
             case "App\Rules\UsernameRule":
             case "App\Rules\ImageUploadRule":
             case "App\Rules\VideoUploadRule":
+            case "App\Rules\ChangePasswordRequest":
                 $errorCode = ResponseCodeEnum::CODE_1004;
                 break;
 
             case "String":
+            case "Integer":
                 $errorCode = ResponseCodeEnum::CODE_1003;
                 break;
 

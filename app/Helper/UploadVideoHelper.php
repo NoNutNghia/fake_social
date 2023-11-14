@@ -15,4 +15,8 @@ class UploadVideoHelper
 
         return false;
     }
+
+    static public function deleteVideo($oldPath) {
+        return Storage::delete($oldPath);
+    }
 }

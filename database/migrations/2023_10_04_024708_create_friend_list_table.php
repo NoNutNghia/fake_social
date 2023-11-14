@@ -17,6 +17,7 @@ class CreateFriendListTable extends Migration
             $table->id();
             $table->integer('friend_id');
             $table->integer('user_id');
+            $table->timestamp('created_at');
         });
     }
 

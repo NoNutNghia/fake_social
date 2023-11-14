@@ -16,12 +16,17 @@ class CreatePushNotiTable extends Migration
         Schema::create('push_noti', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id');
-            $table->boolean('noti_request');
-            $table->boolean('noti_post_by_myself');
-            $table->boolean('noti_comment');
-            $table->boolean('noti_react_post');
-            $table->boolean('noti_react_comment');
-            $table->boolean('noti_post_by_friend');
+            $table->boolean('like_comment')->default(true);
+            $table->boolean('from_friends')->default(true);
+            $table->boolean('requested_friends')->default(true);
+            $table->boolean('suggested_friend')->default(true);
+            $table->boolean('birthday')->default(true);
+            $table->boolean('video')->default(true);
+            $table->boolean('report')->default(true);
+            $table->boolean('sound_on')->default(true);
+            $table->boolean('notification_on')->default(true);
+            $table->boolean('vibrant_on')->default(true);
+            $table->boolean('led_on')->default(true);
             $table->timestamps();
         });
     }

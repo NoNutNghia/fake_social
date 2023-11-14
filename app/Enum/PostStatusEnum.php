@@ -11,4 +11,5 @@ final class PostStatusEnum extends Enum implements LocalizedEnum
     public const FRIENDS = 2;
     public const PRIVATE_POST = 3;
     public const DELETE_POST = 4;
+    public const BLOCKED_POST = 5;
 }

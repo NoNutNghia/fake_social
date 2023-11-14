@@ -7,7 +7,8 @@ class ReportPost extends BaseModel
     protected $fillable = [
         'user_id',
         'post_id',
-        'content',
+        'subject',
+        'details',
         'created_at',
     ];
 

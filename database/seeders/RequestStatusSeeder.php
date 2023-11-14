@@ -20,7 +20,10 @@ class RequestStatusSeeder extends Seeder
             ),
             array(
                 'request_status' => 'user_deny'
-            )
+            ),
+            array(
+                'request_status' => 'user_pending'
+            ),
         ));
     }
 }
