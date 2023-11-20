@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTypeRequestTable extends Migration
+class CreateConversationTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,11 @@ class CreateTypeRequestTable extends Migration
      */
     public function up()
     {
-        Schema::create('type_request', function (Blueprint $table) {
+        Schema::create('conversation', function (Blueprint $table) {
             $table->id();
-            $table->string('type_request_name');
+            $table->integer('user_id');
+            $table->integer('partner_id');
+            $table->timestamp('created_at');
         });
     }
 
@@ -26,6 +28,6 @@ class CreateTypeRequestTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('type_request');
+        Schema::dropIfExists('conversation');
     }
 }

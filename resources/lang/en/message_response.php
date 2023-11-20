@@ -4,6 +4,7 @@ use App\Enum\ResponseCodeEnum;
 
 return [
     ResponseCodeEnum::CODE_1000 => "OK",
+    ResponseCodeEnum::CODE_9991 => "Not enough coins",
     ResponseCodeEnum::CODE_9992 => "Post is not existed",
     ResponseCodeEnum::CODE_9993 => "Code verify is incorrect",
     ResponseCodeEnum::CODE_9994 => "No Data or end of list data",

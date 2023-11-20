@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-
-class SearchPostRequest extends BaseRequest
+class GetUserFriendsRequest extends BaseRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -15,20 +13,15 @@ class SearchPostRequest extends BaseRequest
     {
         return [
             'user_id' => [
-                'required',
                 'integer'
-            ],
-            'keyword' => [
-                'required',
-                'string',
             ],
             'index' => [
                 'integer',
-                'min:0'
+                'min:0',
             ],
             'count' => [
                 'integer',
-                'min:0'
+                'min:0',
             ]
         ];
     }

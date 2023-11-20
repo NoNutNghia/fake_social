@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enum\ResponseCodeEnum;
 use App\Response\Model\ResponseObject;
+use App\Rules\DevTokenRule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -36,11 +37,15 @@ class BaseRequest extends FormRequest
             case "Min":
             case "Max":
             case "File":
+            case "Array":
             case "App\Rules\EmailRule":
             case "App\Rules\UsernameRule":
             case "App\Rules\ImageUploadRule":
             case "App\Rules\VideoUploadRule":
             case "App\Rules\ChangePasswordRequest":
+            case "App\Rules\LatitudeRule":
+            case "App\Rules\LongitudeRule":
+            case "App\Rules\DevTokenRule":
                 $errorCode = ResponseCodeEnum::CODE_1004;
                 break;
 

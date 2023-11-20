@@ -5,6 +5,7 @@ namespace App\Services;
 use App\DTO\PushNotificationDTO;
 use App\Enum\ResponseCodeEnum;
 use App\Http\Requests\SetPushSettingsRequest;
+use App\Models\PushNotification;
 use App\Response\Model\ResponseObject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,26 +13,18 @@ use Illuminate\Support\Facades\DB;
 
 class PushNotificationService extends BaseService
 {
-//    public function editPushNotification(Request $request)
-//    {
-//        $pushNotificationDTO = new PushNotificationDTO(
-//            $request->noti_request,
-//            $request->noti_post_by_myself,
-//            $request->noti_comment,
-//            $request->noti_request,
-//            $request->noti_react_comment,
-//            $request->noti_post_by_friend,
-//        );
-//
-//        $pushNotificationUser = Auth::user()->userPushNotification;
-//    }
-
     public function getPushSettings(Request $request)
     {
         $pushSetting = Auth::user()->pushNotification;
 
         $response = new ResponseObject(ResponseCodeEnum::CODE_1000, $pushSetting->toArray());
         return $this->responseData($response);
+    }
+
+    public function createPushSettings($userId) {
+        $pushNotification = new PushNotification();
+        $pushNotification->user_id = $userId;
+        $pushNotification->save();
     }
 
     public function setPushSettings(SetPushSettingsRequest $setPushSettingsRequest)

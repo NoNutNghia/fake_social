@@ -2,6 +2,8 @@
 
 use App\Enum\ResponseCodeEnum;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ConversationController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PeopleRelationshipController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PushNotificationController;
@@ -51,11 +53,26 @@ Route::middleware('db.connection')->group(function () {
         Route::post('/set_push_settings', [PushNotificationController::class, 'setPushSettings']);
         Route::post('/set_block', [PeopleRelationshipController::class, 'setBlock']);
         Route::post('/check_new_version', [VersionController::class, 'checkNewVersion']);
-//        Route::post('/get_notification');
-//        Route::post('set_read_notification');
-//        Route::post('/set_devtoken');
+        Route::post('/edit_post', [PostController::class, 'editPost']);
+        Route::post('get_user_friends', [PeopleRelationshipController::class, 'getUserFriends']);
+        Route::post('get_list_posts', [PostController::class, 'getListPosts']);
+        Route::post('/get_list_videos', [PostController::class, 'getListPosts']);
+        Route::post('/check_new_items', [PostController::class, 'checkNewItems']);
+        Route::post('/get_list_suggested_friends', [PeopleRelationshipController::class, 'getListSuggestedFriends']);
+        Route::post('/get_notification', [NotificationController::class, 'getNotification']);
+        Route::post('set_read_notification', [NotificationController::class, 'setReadNotification']);
+        Route::post('/set_devtoken', [AuthController::class, 'setDevToken']);
+        Route::post('/delete_conversation', [ConversationController::class, 'deleteConversation']);
+        Route::post('get_conversation', [ConversationController::class, 'getConversation']);
+        Route::post('/delete_message', [ConversationController::class, 'deleteMessage']);
+        Route::post('/get_list_conversation', [ConversationController::class, 'getListConversation']);
+        Route::post('/set_read_message', [ConversationController::class, 'setReadMessage']);
+//        Route::post('/delete_comment'); - No document -
+//        Route::post('/buy_token'); - No document -
+//        Route::post('/transfer_token'); - No document -
+//        Route::post('/deactive_user'); - No document -
         Route::post('/get_user_info', [AuthController::class, 'getUserInfo']);
-        Route::post('set_user_info', [AuthController::class, 'setUserInfo']);
+        Route::post('/set_user_info', [AuthController::class, 'setUserInfo']);
     });
 
     Route::fallback(function () {

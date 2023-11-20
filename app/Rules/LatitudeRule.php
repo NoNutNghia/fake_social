@@ -4,21 +4,19 @@ namespace App\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 
-class NewPasswordRule implements Rule
+class LatitudeRule implements Rule
 {
-    private string $password;
 
-    private string $newPassword;
+    private string $latitude;
 
     /**
      * Create a new rule instance.
      *
      * @return void
      */
-    public function __construct($password, $newPassword)
+    public function __construct($latitude)
     {
-        $this->password = trim($password);
-        $this->newPassword = trim($newPassword);
+        $this->latitude = $latitude;
     }
 
     /**
@@ -30,7 +28,7 @@ class NewPasswordRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        return !($this->password === $this->newPassword);
+        return preg_match('/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/', $this->latitude);
     }
 
     /**

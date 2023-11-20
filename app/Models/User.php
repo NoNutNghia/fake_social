@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Enum\RequestStatusEnum;
-use App\Enum\TypeRequestEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -51,6 +50,8 @@ class User extends Authenticatable
         'phone',
         'email_verified_at',
         'uuid',
+        'list_friends',
+        'list_user_blocked',
     ];
 
     /**
@@ -72,7 +73,7 @@ class User extends Authenticatable
         return $this->hasMany(VerifyCode::class, 'user_id', 'id');
     }
 
-    public function listUserBlocked()
+    public function list_user_blocked()
     {
         return $this->hasMany(BlockList::class, 'user_id', 'id');
     }
@@ -80,9 +81,7 @@ class User extends Authenticatable
     public function sendRequestFriend()
     {
         return $this->hasMany(RequestFriend::class, 'user_id', 'id')
-            ->where('request_status', RequestStatusEnum::USER_PENDING)
-            ->where('request_type', TypeRequestEnum::USER_SEND)
-            ->get();
+            ->where('request_status', RequestStatusEnum::USER_PENDING);
     }
 
     public function pushNotification()
@@ -90,8 +89,13 @@ class User extends Authenticatable
         return $this->hasOne(PushNotification::class,'user_id', 'id');
     }
 
-    public function listFriends()
+    public function list_friends()
     {
         return $this->hasMany(FriendList::class, 'user_id', 'id');
+    }
+
+    public function dev_token()
+    {
+        return $this->hasMany(DevToken::class, 'user_id', 'id');
     }
 }

@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SearchPostRequest extends BaseRequest
+class DeleteMessageRequest extends BaseRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -14,21 +14,17 @@ class SearchPostRequest extends BaseRequest
     public function rules()
     {
         return [
-            'user_id' => [
+            'message_id' => [
                 'required',
                 'integer'
             ],
-            'keyword' => [
+            'conversation_id' => [
                 'required',
-                'string',
+                'integer'
             ],
-            'index' => [
-                'integer',
-                'min:0'
-            ],
-            'count' => [
-                'integer',
-                'min:0'
+            'partner_id' => [
+                'required',
+                'integer'
             ]
         ];
     }

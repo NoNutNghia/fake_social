@@ -4,21 +4,19 @@ namespace App\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 
-class NewPasswordRule implements Rule
+class DevTokenRule implements Rule
 {
-    private string $password;
 
-    private string $newPassword;
+    private string $devToken;
 
     /**
      * Create a new rule instance.
      *
      * @return void
      */
-    public function __construct($password, $newPassword)
+    public function __construct($devToken)
     {
-        $this->password = trim($password);
-        $this->newPassword = trim($newPassword);
+        $this->devToken = trim($devToken);
     }
 
     /**
@@ -30,7 +28,7 @@ class NewPasswordRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        return !($this->password === $this->newPassword);
+        return $this->devToken;
     }
 
     /**

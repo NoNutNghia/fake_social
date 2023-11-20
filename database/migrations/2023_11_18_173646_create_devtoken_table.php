@@ -1,11 +1,10 @@
 <?php
 
-use App\Enum\RequestStatusEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRequestFriendTable extends Migration
+class CreateDevtokenTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,12 +13,12 @@ class CreateRequestFriendTable extends Migration
      */
     public function up()
     {
-        Schema::create('request_friend', function (Blueprint $table) {
+        Schema::create('devtoken', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id');
-            $table->integer('target_id');
-            $table->tinyInteger('request_status')->default(RequestStatusEnum::USER_PENDING);
-            $table->timestamps();
+            $table->string("devToken");
+            $table->tinyInteger("devType");
+            $table->timestamp("created_at");
         });
     }
 
@@ -30,6 +29,6 @@ class CreateRequestFriendTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('request_friend');
+        Schema::dropIfExists('devtoken');
     }
 }

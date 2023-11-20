@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Storage;
 
 class UploadVideoHelper
 {
-    static public function uploadVideo($file, $post_id, $sortIndex)
+    static public function uploadVideo($file, $post_id, $sortIndex = 0)
     {
         $path = "public/post/" . $post_id . "/videos/";
         if (Storage::putFileAs($path, $file, $sortIndex . '.' .  $file->getClientOriginalExtension())) {

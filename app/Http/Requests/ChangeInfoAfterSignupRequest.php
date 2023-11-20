@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Rules\EmailRule;
+use App\Rules\ImageUploadRule;
 use App\Rules\UsernameRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -23,6 +24,7 @@ class ChangeInfoAfterSignupRequest extends BaseRequest
                 'max:10',
                 new UsernameRule($this["username"])
             ],
+            "avatar" => [new ImageUploadRule($this->file('avatar'))],
         ];
     }
 }

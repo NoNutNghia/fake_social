@@ -15,13 +15,18 @@ use Illuminate\Support\Str;
 class SignupService extends BaseService
 {
     private UserRepository $userRepository;
+    private PushNotificationService $pushNotificationService;
 
     /**
      * @param UserRepository $userRepository
      */
-    public function __construct(UserRepository $userRepository)
+    public function __construct(
+        UserRepository $userRepository,
+        PushNotificationService $pushNotificationService
+    )
     {
         $this->userRepository = $userRepository;
+        $this->pushNotificationService = $pushNotificationService;
     }
 
     public function signup(SignupRequest $signupRequest)
@@ -48,6 +53,9 @@ class SignupService extends BaseService
             $verifyCode->token = $this->genVerifyToken();
 
             $verifyCode->save();
+
+            $this->pushNotificationService->createPushSettings($user->id);
+
             DB::commit();
 
             $response = new ResponseObject(ResponseCodeEnum::CODE_1000, $verifyCode->toArray());

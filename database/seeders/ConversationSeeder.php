@@ -2,10 +2,11 @@
 
 namespace Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class TypeRequestSeeder extends Seeder
+class ConversationSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,12 +15,11 @@ class TypeRequestSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('type_request')->insert(array(
+        DB::table('conversation')->insert(array(
             array(
-                'type_request_name' => 'user_receive'
-            ),
-            array(
-                'type_request_name' => 'user_send'
+                'user_id' => 1,
+                'partner_id' => 2,
+                'created_at' => Carbon::now()
             )
         ));
     }

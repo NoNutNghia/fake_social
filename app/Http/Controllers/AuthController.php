@@ -6,6 +6,7 @@ use App\Http\Requests\ChangeInfoAfterSignupRequest;
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\GetUserInfoRequest;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\SetDevTokenRequest;
 use App\Http\Requests\SetUserInfoRequest;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
@@ -56,5 +57,10 @@ class AuthController extends Controller
     public function setUserInfo(SetUserInfoRequest $setUserInfoRequest)
     {
         return $this->authService->setUserInfo($setUserInfoRequest);
+    }
+
+    public function setDevToken(SetDevTokenRequest $setDevTokenRequest)
+    {
+        return $this->authService->setDevToken($setDevTokenRequest);
     }
 }

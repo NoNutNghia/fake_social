@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\GetListBlocksRequest;
+use App\Http\Requests\GetListSuggestedFriendsRequest;
 use App\Http\Requests\GetRequestedFriendsRequest;
+use App\Http\Requests\GetUserFriendsRequest;
 use App\Http\Requests\SetAcceptFriendRequest;
 use App\Http\Requests\SetBlockRequest;
 use App\Http\Requests\SetRequestFriend;
@@ -44,5 +46,15 @@ class PeopleRelationshipController extends Controller
     public function setBlock(SetBlockRequest $setBlockRequest)
     {
         return $this->peopleRelationshipService->setBlock($setBlockRequest);
+    }
+
+    public function getUserFriends(GetUserFriendsRequest $getUserFriendsRequest)
+    {
+        return $this->peopleRelationshipService->getUserFriends($getUserFriendsRequest);
+    }
+
+    public function getListSuggestedFriends(GetListSuggestedFriendsRequest $getListSuggestedFriendsRequest)
+    {
+        return $this->peopleRelationshipService->getListSuggestedFriends($getListSuggestedFriendsRequest);
     }
 }

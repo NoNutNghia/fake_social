@@ -5,9 +5,10 @@ namespace App\Services;
 use App\Enum\RequestStatusEnum;
 use App\Enum\ResponseCodeEnum;
 use App\Enum\StatusUserEnum;
-use App\Enum\TypeRequestEnum;
 use App\Http\Requests\GetListBlocksRequest;
+use App\Http\Requests\GetListSuggestedFriendsRequest;
 use App\Http\Requests\GetRequestedFriendsRequest;
+use App\Http\Requests\GetUserFriendsRequest;
 use App\Http\Requests\SetAcceptFriendRequest;
 use App\Http\Requests\SetBlockRequest;
 use App\Http\Requests\SetRequestFriend;
@@ -25,7 +26,7 @@ class PeopleRelationshipService extends BaseService
     public function getRequestedFriends(GetRequestedFriendsRequest $getRequestedFriendsRequest)
     {
         $requestedFriends = RequestFriend::where('user_id', Auth::user()->id)
-            ->where('request_type', TypeRequestEnum::USER_RECEIVE)
+            ->where('request_status', RequestStatusEnum::USER_PENDING)
             ->offset($getRequestedFriendsRequest->index)
             ->limit($getRequestedFriendsRequest->count)
             ->get()
@@ -51,7 +52,6 @@ class PeopleRelationshipService extends BaseService
             $foundRequestedFriend = RequestFriend::where('user_id', Auth::user()->id)
                 ->where('target_id', $setAcceptedFriendRequest->user_id)
                 ->where('request_status', RequestStatusEnum::USER_PENDING)
-                ->where('request_type', TypeRequestEnum::USER_RECEIVE)
                 ->first();
 
             if (!$foundRequestedFriend) {
@@ -59,12 +59,12 @@ class PeopleRelationshipService extends BaseService
                 return $this->responseData($responseError);
             }
 
-            $foundRequestedFriend->request_status = $setAcceptedFriendRequest->is_accept
+            $foundRequestedFriend->request_status = $setAcceptedFriendRequest->is_accepted
                 ? RequestStatusEnum::USER_APPROVE : RequestStatusEnum::USER_DENY;
 
             $foundRequestedFriend->save();
 
-            if ($setAcceptedFriendRequest->is_accept) {
+            if ($setAcceptedFriendRequest->is_accepted) {
                 FriendList::insert(array(
                     array(
                         'user_id' => Auth::user()->id,
@@ -94,7 +94,10 @@ class PeopleRelationshipService extends BaseService
     public function setRequestFriend(SetRequestFriend $setRequestFriend)
     {
         try {
-            if (Auth::user()->id == $setRequestFriend->user_id) {
+
+        $currentUser = Auth::user();
+
+            if ($currentUser->id == $setRequestFriend->user_id) {
                 $responseError = new ResponseObject(ResponseCodeEnum::CODE_1010);
                 return $this->responseData($responseError);
             }
@@ -108,24 +111,32 @@ class PeopleRelationshipService extends BaseService
                 return $this->responseData($responseError);
             }
 
-            $blockUserList = $foundUser->listUserBlocked->pluck('user_blocked_id');
+            $blockUserList = $foundUser->list_user_blocked->pluck('user_blocked_id');
 
-            if ($blockUserList->contains(Auth::user()->id)) {
+            if ($blockUserList->contains($currentUser->id)) {
                 $responseError = new ResponseObject(ResponseCodeEnum::CODE_1009);
+                return $this->responseData($responseError);
+            }
+
+            $foundRequest = RequestFriend::where('user_id', $currentUser->id)
+                ->where('target_id', $setRequestFriend->user_id)
+                ->where('request_status', RequestStatusEnum::USER_PENDING)
+                ->first();
+
+            if ($foundRequest) {
+                $responseError = new ResponseObject(ResponseCodeEnum::CODE_1010);
                 return $this->responseData($responseError);
             }
 
             $requestFriend = new RequestFriend();
 
-            $requestFriend->user_id = Auth::user()->id;
+            $requestFriend->user_id = $currentUser->id;
             $requestFriend->target_id = $setRequestFriend->user_id;
-            $requestFriend->request_type = TypeRequestEnum::USER_SEND;
-
             $requestFriend->save();
 
             DB::commit();
 
-            $countRequestFriend = Auth::user()->sendRequestFriend->count();
+            $countRequestFriend = $currentUser->sendRequestFriend->count();
 
             $data = [
                 'requested_friends' => $countRequestFriend
@@ -209,5 +220,82 @@ class PeopleRelationshipService extends BaseService
             $responseError = new ResponseObject(ResponseCodeEnum::CODE_9999);
             return $this->responseData($responseError);
         }
+    }
+
+    public function getUserFriends(GetUserFriendsRequest $getUserFriendsRequest)
+    {
+        if ($getUserFriendsRequest->user_id) {
+            $user = User::where('id', $getUserFriendsRequest->user_id)->first();
+        } else {
+            $user = Auth::user();
+        }
+
+        if (isset($getUserFriendsRequest->index) && isset($getUserFriendsRequest->count)) {
+            $listFriends = FriendList::where('user_id', $user->id)
+                ->offset($getUserFriendsRequest->index)
+                ->limit($getUserFriendsRequest->count)
+                ->get();
+        } else {
+            $listFriends = FriendList::where('user_id', $user->id)
+                ->limit(5)
+                ->get();
+        }
+
+        $count = count($listFriends);
+
+        if ($user->id != Auth::user()->id) {
+            foreach ($listFriends as $friend) {
+                $sameFriends = $friend->detail_friend->list_friends->pluck('friend_id')->intersect($listFriends->pluck('friend_id'))->count();
+                $friend['same_friends'] = $sameFriends;
+            }
+        }
+
+        $data = [
+            'friends' => $listFriends,
+            'total' => $count
+        ];
+
+        $response = new ResponseObject(ResponseCodeEnum::CODE_1000, $data);
+
+        return $this->responseData($response);
+    }
+
+    public function getListSuggestedFriends(GetListSuggestedFriendsRequest $getListSuggestedFriendsRequest)
+    {
+
+        $listUserIDFriends = Auth::user()->list_friends->pluck('friend_id');
+
+        if (isset($getListSuggestedFriendsRequest->index) && isset($getListSuggestedFriendsRequest->count)) {
+            $listUserSuggest = User::whereNotIn('id', $listUserIDFriends)
+                ->inRandomOrder()
+                ->offset($getListSuggestedFriendsRequest->index)
+                ->limit($getListSuggestedFriendsRequest->count)
+                ->get();
+        } else {
+            $listUserSuggest = User::whereNotIn('id', $listUserIDFriends)
+                ->inRandomOrder()
+                ->limit(5)
+                ->get();
+        }
+
+        if ($listUserSuggest->isEmpty()) {
+            $response = new ResponseObject(ResponseCodeEnum::CODE_1000);
+
+            return $this->responseData($response);
+        }
+
+        foreach ($listUserSuggest as $friend) {
+            $sameFriends = $friend->list_friends->pluck('friend_id')
+                ->intersect($listUserIDFriends)->count();
+            $friend['same_friends'] = $sameFriends;
+        }
+
+        $data = [
+            'list_users' => $listUserSuggest
+        ];
+
+        $response = new ResponseObject(ResponseCodeEnum::CODE_1000, $data);
+
+        return $this->responseData($response);
     }
 }

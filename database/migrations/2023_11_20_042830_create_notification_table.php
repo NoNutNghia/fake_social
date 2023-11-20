@@ -1,11 +1,11 @@
 <?php
 
-use App\Enum\RequestStatusEnum;
+use App\Enum\NotificationReadEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRequestFriendTable extends Migration
+class CreateNotificationTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,11 +14,13 @@ class CreateRequestFriendTable extends Migration
      */
     public function up()
     {
-        Schema::create('request_friend', function (Blueprint $table) {
+        Schema::create('notification', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id');
-            $table->integer('target_id');
-            $table->tinyInteger('request_status')->default(RequestStatusEnum::USER_PENDING);
+            $table->string('title');
+            $table->integer('object_id');
+            $table->string('type');
+            $table->boolean('read')->default(NotificationReadEnum::UN_READ);
             $table->timestamps();
         });
     }
@@ -30,6 +32,6 @@ class CreateRequestFriendTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('request_friend');
+        Schema::dropIfExists('notification');
     }
 }

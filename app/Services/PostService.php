@@ -10,8 +10,11 @@ use App\Enum\StatusUserEnum;
 use App\Helper\UploadImageHelper;
 use App\Helper\UploadVideoHelper;
 use App\Http\Requests\AddPostRequest;
+use App\Http\Requests\CheckNewItemsRequest;
 use App\Http\Requests\DeletePostRequest;
+use App\Http\Requests\EditPostRequest;
 use App\Http\Requests\FeelRequest;
+use App\Http\Requests\GetListPostsRequest;
 use App\Http\Requests\GetMarkCommentRequest;
 use App\Http\Requests\GetPostRequest;
 use App\Http\Requests\ReportPostRequest;
@@ -30,6 +33,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
+use Nette\Utils\Image;
 
 class PostService extends BaseService
 {
@@ -54,11 +58,11 @@ class PostService extends BaseService
 
             $checkImageFile = $addPostRequest->hasFile('image');
             $checkVideoFile = $addPostRequest->hasFile('video');
-            $indexSort = 1;
+            $indexSort = 0;
 
             if ($checkImageFile) {
                 $imageList = array();
-                $fileList = $addPostRequest->file('image');
+                $fileList = $addPostRequest->image;
 
                 foreach ($fileList as $file) {
                     $result = UploadImageHelper::uploadImage($file, $post->id, $indexSort);
@@ -71,6 +75,8 @@ class PostService extends BaseService
                             "created_at" => Carbon::now(),
                         ));
                     }
+
+                    $indexSort++;
                 }
 
                 ImagePost::upsert($imageList, ["post_id", "url", "sort_index", "created_at"]);
@@ -78,7 +84,7 @@ class PostService extends BaseService
 
             if ($checkVideoFile && !$checkImageFile) {
                 $videoList = array();
-                $fileList = $addPostRequest->file('video');
+                $fileList = $addPostRequest->video;
 
                 foreach ($fileList as $file) {
                     $result = UploadVideoHelper::uploadVideo($file, $post->id, $indexSort);
@@ -125,7 +131,7 @@ class PostService extends BaseService
             return $this->responseData($responseError);
         }
 
-        $checkBlock = $post->authorPost->listUserBlocked->pluck('user_blocked_id')->contains(function ($value, $key) {
+        $checkBlock = $post->authorPost->list_user_blocked->pluck('user_blocked_id')->contains(function ($value, $key) {
             return $value == Auth::user()->id;
         });
 
@@ -133,6 +139,8 @@ class PostService extends BaseService
 
         $ratingList = $post->haveRating;
         $markList = $post->haveMark;
+        $post->image;
+        $post->video;
 
         $post = collect($post);
 
@@ -171,9 +179,85 @@ class PostService extends BaseService
         return $this->responseData($response);
     }
 
-    public function editPost()
+    public function editPost(EditPostRequest $editPostRequest)
     {
+        try {
+            DB::beginTransaction();
+            $post = Post::where('id', $editPostRequest->id)->first();
 
+            if (!$post) {
+                $responseError = new ResponseObject(ResponseCodeEnum::CODE_9992);
+                return $this->responseData($responseError);
+            }
+
+            if ($post->user_id != Auth::user()->id) {
+                $responseError = new ResponseObject(ResponseCodeEnum::CODE_1009);
+                return $this->responseData($responseError);
+            }
+
+            if ($editPostRequest->image_del) {
+                $imageList = $post->image;
+
+                foreach ($imageList as $image) {
+                    $resultDelete = UploadImageHelper::deleteImage($image->url);
+                    if ($resultDelete) $image->delete();
+                }
+            }
+
+            if ($editPostRequest->image_sort && $editPostRequest->hasFile('image')) {
+                $count = 0;
+                $imageArray = [];
+
+                foreach ($editPostRequest->file('image') as $imageItem) {
+                    $result = UploadImageHelper::uploadImage($imageItem, $post->id, $editPostRequest->image_sort[$count]);
+
+                    if ($result) {
+                        array_push($imageArray, array(
+                            "post_id" => $post->id,
+                            "url" => $result,
+                            "sort_index" => $editPostRequest->image_sort[$count],
+                            "created_at" => Carbon::now(),
+                        ));
+                    }
+                    $count++;
+                }
+
+                ImagePost::upsert($imageArray, ["post_id", "url", "sort_index", "created_at"]);
+            }
+
+            if ($editPostRequest->hasFile('video')) {
+                $video = $editPostRequest->file('video');
+
+                $result = UploadVideoHelper::uploadVideo($video, $post->id);
+
+                if ($result) {
+                    $video = new VideoPost();
+                    $video->post_id = $post->id;
+                    $video->url = $result;
+                    $video->sort_index = 0;
+                    $video->created_at = Carbon::now();
+
+                    $video->save();
+                }
+            }
+
+            $post->described = $editPostRequest->described ?? "";
+            $post->status = $editPostRequest->status ?? "";
+
+            $post->save();
+
+            Auth::user()->decrement('coins', 10);
+
+            DB::commit();
+
+            $response = new ResponseObject(ResponseCodeEnum::CODE_1000, ["coins" => Auth::user()->coins]);
+            return $this->responseData($response);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $responseError = new ResponseObject(ResponseCodeEnum::CODE_9999);
+            return $this->responseData($responseError);
+        }
     }
 
     public function deletePost(DeletePostRequest $deletePostRequest)
@@ -417,6 +501,91 @@ class PostService extends BaseService
             $responseError = new ResponseObject(ResponseCodeEnum::CODE_9999);
             return $this->responseData($responseError);
         }
+    }
+
+    public function getListPosts(GetListPostsRequest $getListPostsRequest)
+    {
+        if (isset($getListPostsRequest->index) && isset($getListPostsRequest->count)) {
+            $listPost = Post::where('id', '>=', $getListPostsRequest->last_id)
+                ->offset($getListPostsRequest->index)
+                ->limit($getListPostsRequest->count)
+                ->get();
+        } else {
+            $listPost = Post::where('id', '>=', $getListPostsRequest->last_id)->orderByDesc('id')->limit(20)->get();
+        }
+
+        foreach ($listPost as $post) {
+            $checkBlock = $post->authorPost->list_user_blocked->pluck('user_blocked_id')->contains(function ($value, $key) {
+                return $value == Auth::user()->id;
+            });
+
+            $checkEdit = $post->authorPost->id == Auth::user()->id;
+
+            $ratingList = $post->haveRating;
+            $markList = $post->haveMark;
+            $post->image;
+            $post->video;
+
+            $countCommentMark = 0;
+
+            $post = collect($post);
+
+            foreach ($markList as $mark) {
+                $countCommentMark += $mark->comments->count();
+            }
+
+            $post['is_blocked'] = 0;
+            $post['is_rate'] = 0;
+
+            if (!$ratingList->pluck('user_id')->contains(Auth::user()->id)) {
+                $post["is_felt"] = 1;
+            }
+
+            $ratingCount = $ratingList->count();
+            $countCommentMark += $markList->count();
+
+            $post['feel'] = $ratingCount;
+            $post['comment_mark'] = $countCommentMark;
+
+            $post['can_edit'] = $checkEdit ? 1 : 0;
+            $post['url'] = URL::current();
+
+            $post->forget('have_rating');
+            $post->forget('have_mark');
+
+            if ($checkBlock) {
+                $post->transform(function ($item, $key) {
+                    return "";
+                });
+                $post['is_blocked'] = 1;
+            }
+        }
+
+        $lastItem = Post::orderByDesc('id')->first();
+        $newItem = Post::whereBetween('id', [$listPost->first()->id, $lastItem->id])->get()->count() - 1;
+
+        $data = [
+            'post' => $listPost,
+            'last_id' => $lastItem->id,
+            'new_items' => $newItem,
+        ];
+
+        $response = new ResponseObject(ResponseCodeEnum::CODE_1000, $data);
+
+        return $this->responseData($response);
+    }
+
+    public function checkNewItems(CheckNewItemsRequest $checkNewItemsRequest)
+    {
+        $lastItem = Post::orderByDesc('id')->first();
+        $countNewItems = Post::whereBetween('id', [$checkNewItemsRequest->last_id, $lastItem->id])->get()->count() - 1;
+
+        $data = [
+            "new_items" => max($countNewItems, 0),
+        ];
+
+        $response = new ResponseObject(ResponseCodeEnum::CODE_1000, $data);
+        return $this->responseData($response);
     }
 
 //    private function checkCanRate($authorPost, ) {

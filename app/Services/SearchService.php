@@ -6,6 +6,7 @@ use App\Enum\ResponseCodeEnum;
 use App\Http\Requests\DeleteSavedSearchRequest;
 use App\Http\Requests\GetSavedSearchRequest;
 use App\Http\Requests\SearchPostRequest;
+use App\Models\Post;
 use App\Models\Search;
 use App\Response\Model\ResponseObject;
 use Carbon\Carbon;
@@ -16,6 +17,13 @@ class SearchService extends BaseService
 {
     public function searchPost(SearchPostRequest $searchPostRequest)
     {
+
+        if ($searchPostRequest->user_id != Auth::user()->id) {
+            $responseError = new ResponseObject(ResponseCodeEnum::CODE_1004);
+
+            return $this->responseData($responseError);
+        }
+
         $search = new Search();
 
         $search->keyword = $searchPostRequest->keyword;
@@ -23,6 +31,25 @@ class SearchService extends BaseService
         $search->created_at = Carbon::now();
 
         $search->save();
+
+        if (isset($searchPostRequest->index) && isset($searchPostRequest->count)) {
+            $listPost = Post::where('described', 'LIKE', '%' . $searchPostRequest->keyword . '%')
+                ->offset($searchPostRequest->index)
+                ->limit($searchPostRequest->count)
+                ->get();
+        } else {
+            $listPost = Post::where('described', 'LIKE', '%' . $searchPostRequest->keyword . '%')->get();
+        }
+
+        foreach ($listPost as $post) {
+            $post->image;
+            $post->video;
+            $post->authorPost;
+        }
+
+        $response = new ResponseObject(ResponseCodeEnum::CODE_1000, $listPost->toArray());
+
+        return $this->responseData($response);
     }
 
     public function getSavedSearch(GetSavedSearchRequest $getSavedSearchRequest)

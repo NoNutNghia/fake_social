@@ -19,10 +19,12 @@ class DatabaseSeeder extends Seeder
         $this->call(PushNotificationSeeder::class);
         $this->call(RoleSeeder::class);
         $this->call(UserSeeder::class);
-        $this->call(TypeRequestSeeder::class);
         $this->call(GenderSeeder::class);
         $this->call(RequestStatusSeeder::class);
         $this->call(RatingPostSeeder::class);
         $this->call(VersionSeeder::class);
+        $this->call(MessageSeeder::class);
+        $this->call(ConversationSeeder::class);
+        $this->call(NotificationSeeder::class);
     }
 }

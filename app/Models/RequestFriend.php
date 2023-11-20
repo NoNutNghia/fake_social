@@ -12,7 +12,6 @@ class RequestFriend extends Model
     protected $fillable = [
         'user_id',
         'target_id',
-        'request_type',
         'request_status',
     ];
 
@@ -20,6 +19,6 @@ class RequestFriend extends Model
 
     public function detailUser()
     {
-        return $this->hasOne(User::class, 'user_id', 'id');
+        return $this->hasOne(User::class, 'id', 'user_id');
     }
 }

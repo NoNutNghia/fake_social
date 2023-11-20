@@ -9,10 +9,13 @@ use App\Http\Requests\ChangeInfoAfterSignupRequest;
 use App\Http\Requests\ChangePasswordRequest;
 use App\Http\Requests\GetUserInfoRequest;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\SetDevTokenRequest;
 use App\Http\Requests\SetUserInfoRequest;
+use App\Models\DevToken;
 use App\Models\User;
 use App\Repository\UserRepository;
 use App\Response\Model\ResponseObject;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -75,9 +78,25 @@ class AuthService extends BaseService
 
     public function changeInfoAfterSignUp(ChangeInfoAfterSignupRequest $changeInfoAfterSignupRequest)
     {
-        Auth::user()->username = $changeInfoAfterSignupRequest->username;
-        Auth::user()->save();
-        return response()->json(["data" => Auth::user()->toArray()]);
+        try {
+            DB::beginTransaction();
+
+            $user = Auth::user();
+            $user->username = $changeInfoAfterSignupRequest->username;
+            if ($changeInfoAfterSignupRequest->hasFile('avatar')) {
+                $path = UploadImageHelper::uploadAvatar($changeInfoAfterSignupRequest->file('avatar'), $user->id);
+                $user->avatar = $path;
+            }
+            $user->save();
+
+            DB::commit();
+            $response = new ResponseObject(ResponseCodeEnum::CODE_1000, $user->toArray());
+            return $this->responseData($response);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $responseError = new ResponseObject(ResponseCodeEnum::CODE_9999);
+            return $this->responseData($responseError);
+        }
     }
 
     private function clearTokenUser()
@@ -111,10 +130,10 @@ class AuthService extends BaseService
             return $this->responseData($responseError);
         }
 
-        $user['listing'] = $user->listFriends->count();
+        $user['listing'] = $user->list_friends->count();
         $data = collect($user);
         if ($user->id != Auth::user()->id) {
-            $data['is_friend'] = Auth::user()->listFriends->pluck('user_id')->contains($user->id);
+            $data['is_friend'] = Auth::user()->list_friends->pluck('user_id')->contains($user->id);
             $data->forget(['coins']);
         }
 
@@ -170,6 +189,33 @@ class AuthService extends BaseService
             DB::commit();
 
             $response = new ResponseObject(ResponseCodeEnum::CODE_1000);
+            return $this->responseData($response);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $responseError = new ResponseObject(ResponseCodeEnum::CODE_9999);
+            return $this->responseData($responseError);
+        }
+    }
+
+    public function setDevToken(SetDevTokenRequest $setDevTokenRequest)
+    {
+        try {
+            DB::beginTransaction();
+
+            $devToken = new DevToken();
+
+            $devToken->devType = $setDevTokenRequest->devType;
+            $devToken->devToken = $setDevTokenRequest->devToken;
+            $devToken->user_id = Auth::user()->id;
+            $devToken->created_at = Carbon::now();
+
+            $devToken->save();
+
+            DB::commit();
+
+            $response = new ResponseObject(ResponseCodeEnum::CODE_1000);
+
             return $this->responseData($response);
 
         } catch (\Exception $e) {
