@@ -54,10 +54,16 @@ class SearchService extends BaseService
 
     public function getSavedSearch(GetSavedSearchRequest $getSavedSearchRequest)
     {
-        $savedSearch = Search::where('user_id', Auth::user()->id)
-            ->offset($getSavedSearchRequest->index)
-            ->limit($getSavedSearchRequest->count)
-            ->get();
+        if (isset($getSavedSearchRequest->index) && isset($getSavedSearchRequest->count)) {
+            $savedSearch = Search::where('user_id', Auth::user()->id)
+                ->offset($getSavedSearchRequest->index)
+                ->limit($getSavedSearchRequest->count)
+                ->get();
+        } else {
+            $savedSearch = Search::where('user_id', Auth::user()->id)
+                ->limit(20)
+                ->get();
+        }
 
         $response = new ResponseObject(ResponseCodeEnum::CODE_1000, $savedSearch->toArray());
 

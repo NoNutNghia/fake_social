@@ -47,6 +47,7 @@ class AuthService extends BaseService
                 $this->clearTokenUser();
 
                 $token = Auth::user()->createToken(Auth::user()->username ?: Auth::user()->email)->plainTextToken;
+                Auth::user()->increment('coins', 100);
 
                 $data = Auth::user()->toArray();
                 $data['token'] = $token;

@@ -45,6 +45,7 @@ class SignupService extends BaseService
             $user->email = $signupRequest->email;
             $user->password = bcrypt($signupRequest->password);
             $user->uuid = $signupRequest->uuid;
+            $user->coins = 100;
             $user->save();
 
             $verifyCode = new VerifyCode();

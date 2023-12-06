@@ -15,12 +15,10 @@ class GetSavedSearchRequest extends BaseRequest
     {
         return [
             'index' => [
-                'required',
                 'integer',
                 'min:0',
             ],
             'count' => [
-                'required',
                 'integer',
                 'min:0',
             ],

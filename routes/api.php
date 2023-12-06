@@ -54,13 +54,13 @@ Route::middleware('db.connection')->group(function () {
         Route::post('/set_block', [PeopleRelationshipController::class, 'setBlock']);
         Route::post('/check_new_version', [VersionController::class, 'checkNewVersion']);
         Route::post('/edit_post', [PostController::class, 'editPost']);
-        Route::post('get_user_friends', [PeopleRelationshipController::class, 'getUserFriends']);
-        Route::post('get_list_posts', [PostController::class, 'getListPosts']);
+        Route::post('/get_user_friends', [PeopleRelationshipController::class, 'getUserFriends']);
+        Route::post('/get_list_posts', [PostController::class, 'getListPosts']);
         Route::post('/get_list_videos', [PostController::class, 'getListPosts']);
         Route::post('/check_new_items', [PostController::class, 'checkNewItems']);
         Route::post('/get_list_suggested_friends', [PeopleRelationshipController::class, 'getListSuggestedFriends']);
         Route::post('/get_notification', [NotificationController::class, 'getNotification']);
-        Route::post('set_read_notification', [NotificationController::class, 'setReadNotification']);
+        Route::post('/set_read_notification', [NotificationController::class, 'setReadNotification']);
         Route::post('/set_devtoken', [AuthController::class, 'setDevToken']);
         Route::post('/delete_conversation', [ConversationController::class, 'deleteConversation']);
         Route::post('get_conversation', [ConversationController::class, 'getConversation']);

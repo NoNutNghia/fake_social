@@ -25,14 +25,20 @@ class PeopleRelationshipService extends BaseService
 {
     public function getRequestedFriends(GetRequestedFriendsRequest $getRequestedFriendsRequest)
     {
-        $requestedFriends = RequestFriend::where('user_id', Auth::user()->id)
-            ->where('request_status', RequestStatusEnum::USER_PENDING)
-            ->offset($getRequestedFriendsRequest->index)
-            ->limit($getRequestedFriendsRequest->count)
-            ->get()
-            ->each(function ($item, $key) {
-                $item->detailUser;
-            });
+        if (isset($getRequestedFriendsRequest->index) && isset($getRequestedFriendsRequest->count)) {
+            $requestedFriends = RequestFriend::where('user_id', Auth::user()->id)
+                ->where('request_status', RequestStatusEnum::USER_PENDING)
+                ->offset($getRequestedFriendsRequest->index)
+                ->limit($getRequestedFriendsRequest->count)
+                ->get();
+        } else {
+            $requestedFriends = RequestFriend::where('user_id', Auth::user()->id)
+                ->where('request_status', RequestStatusEnum::USER_PENDING)
+                ->get();
+        }
+        $requestedFriends->each(function ($item, $key) {
+            $item->detailUser;
+        });
 
         $response = new ResponseObject(ResponseCodeEnum::CODE_1000, $requestedFriends->toArray());
 
@@ -155,14 +161,20 @@ class PeopleRelationshipService extends BaseService
 
     public function getListBlocks(GetListBlocksRequest $getListBlocksRequest)
     {
-        $blockList = BlockList::where('user_id', Auth::user()->id)->offset($getListBlocksRequest->index)
-            ->limit($getListBlocksRequest->count)
-            ->get()
-            ->each(function ($block, $key) {
-                $detailUser = $block->detailUser;
-                $block['name'] = $detailUser->name;
-                $block['avatar'] = $detailUser->avatar;
-            })->makeHidden(['user_id', 'user_blocked_id']);
+        if (isset($getListBlocksRequest->index) && isset($getListBlocksRequest->count)) {
+            $blockList = BlockList::where('user_id', Auth::user()->id)
+                ->offset($getListBlocksRequest->index)
+                ->limit($getListBlocksRequest->count)
+                ->get();
+        } else {
+            $blockList = BlockList::where('user_id', Auth::user()->id)->get();
+        }
+
+        $blockList->each(function ($block, $key) {
+            $detailUser = $block->detailUser;
+            $block['name'] = $detailUser->name;
+            $block['avatar'] = $detailUser->avatar;
+        })->makeHidden(['user_id', 'user_blocked_id']);
 
         $response = new ResponseObject(ResponseCodeEnum::CODE_1000, $blockList->toArray());
 

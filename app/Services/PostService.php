@@ -28,12 +28,10 @@ use App\Models\ReportPost;
 use App\Models\VideoPost;
 use App\Response\Model\ResponseObject;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
-use Nette\Utils\Image;
 
 class PostService extends BaseService
 {
@@ -58,11 +56,12 @@ class PostService extends BaseService
 
             $checkImageFile = $addPostRequest->hasFile('image');
             $checkVideoFile = $addPostRequest->hasFile('video');
+
             $indexSort = 0;
 
             if ($checkImageFile) {
                 $imageList = array();
-                $fileList = $addPostRequest->image;
+                $fileList = $addPostRequest->file('image');
 
                 foreach ($fileList as $file) {
                     $result = UploadImageHelper::uploadImage($file, $post->id, $indexSort);
@@ -84,7 +83,7 @@ class PostService extends BaseService
 
             if ($checkVideoFile && !$checkImageFile) {
                 $videoList = array();
-                $fileList = $addPostRequest->video;
+                $fileList = $addPostRequest->file('video');
 
                 foreach ($fileList as $file) {
                     $result = UploadVideoHelper::uploadVideo($file, $post->id, $indexSort);
@@ -351,15 +350,25 @@ class PostService extends BaseService
                 return $this->responseData($responseError);
             }
 
+            $foundRating = RatingPost::where('user_id', Auth::user()->id)
+                ->where('post_id', $feelRequest->id)
+                ->first();
+
             $type = $feelRequest->type == 0 ? RatingPostEnum::DISAPPOINTED : RatingPostEnum::KUDOS;
 
-            $ratingPost = new RatingPost();
-            $ratingPost->user_id = Auth::user()->id;
-            $ratingPost->rating = $type;
-            $ratingPost->post_id = $feelRequest->id;
-            $ratingPost->created_at = Carbon::now();
+            if ($foundRating) {
+                $foundRating->rating = $type;
 
-            $ratingPost->save();
+                $foundRating->save();
+            } else {
+                $ratingPost = new RatingPost();
+                $ratingPost->user_id = Auth::user()->id;
+                $ratingPost->rating = $type;
+                $ratingPost->post_id = $feelRequest->id;
+                $ratingPost->created_at = Carbon::now();
+
+                $ratingPost->save();
+            }
 
             DB::commit();
 
